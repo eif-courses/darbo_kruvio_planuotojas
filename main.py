@@ -1,18 +1,32 @@
 import pandas as pd
 
-# Read the tables from Excel files, skipping the first 9 rows and using the 10th row as the header
-main_table = pd.read_excel('main_table.xlsx', header=16)
-teacher_info = pd.read_excel('lecturer_info.xlsx', header=1)  # Adjust header value as needed
+def studiju_plano_pravalymas(ekselio_dokumentas):
+    dieninis = pd.read_excel(ekselio_dokumentas, sheet_name='Dieninis', header=8)
+    dieninis_pravalytas = dieninis[dieninis['DalykoKatedra'].str.len() > 2]
 
-# Print column names to check for typos or case sensitivity
-# print("Main Table Columns:", main_table.columns)
-# print("Teacher Info Columns:", teacher_info.columns)
+    grupe = pd.read_excel(ekselio_dokumentas, sheet_name='Grupes', header=1)
+    merged_data = pd.merge(dieninis_pravalytas, grupe, how='inner', on='Semestras')
+    output_excel_path = 'rezultatas.xlsx'
 
-# Merge data
-merged_data = pd.merge(main_table, teacher_info, on='ReferenceColumn')
+    # Write the merged DataFrame to a new Excel file
+    merged_data.to_excel(output_excel_path, index=False)  # Set index to False if you don't want to write row numbers
 
-# Create Excel sheet with merged data
-with pd.ExcelWriter('output_merged_data.xlsx', engine='xlsxwriter') as writer:
-    # Write the merged data to a new sheet
-    merged_data.to_excel(writer, sheet_name='Merged_Data', index=False)
+
+    # english = pd.read_excel(ekselio_dokumentas, sheet_name='English',
+    #                         header=8)
+    # english_pravalytas = english[english['DalykoKatedra'].str.len() > 2]
+    # print(english_pravalytas)
+    # english_pravalytas.to_excel('english_output.xlsx',
+    #                             index=False)  # Set index to False if you don't want to write row numbers
+    #
+    # sesijinis = pd.read_excel(ekselio_dokumentas, sheet_name='Sesijinis',
+    #                           header=3)
+    # sesijinis_pravalytas = sesijinis[sesijinis['DalykoKatedra'].str.len() > 2]
+    # print(sesijinis_pravalytas)
+    # sesijinis_pravalytas.to_excel('sesijines_output.xlsx',
+    #                               index=False)  # Set index to False if you don't want to write row numbers
+    #
+
+
+studiju_plano_pravalymas('planas.xlsx')
 
